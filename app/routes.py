@@ -18,4 +18,4 @@ def index():
             'body': 'Bet no cap hunnid'
         }
     ]
-    return render_template('index.html', user=user, post=posts)
+    return render_template('index.html', user=user, posts=posts)
