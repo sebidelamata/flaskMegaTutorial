@@ -1,6 +1,7 @@
 # import our database object
 from app import db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # users table
 class User(db.Model):
@@ -20,6 +21,16 @@ class User(db.Model):
     # class instead of just returning the object
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    # this method sets the password hash value for a user to a
+    # hash generated from the user's password input
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    # this method checks the users registered password hash against
+    # the one created by the user input for password
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 # posts table
 class Post(db.Model):
