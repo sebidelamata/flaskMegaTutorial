@@ -1,6 +1,8 @@
 from flask import render_template
 from app import app
+from app.forms import LoginForm
 
+# Homepage
 @app.route('/')
 @app.route('/index')
 def index():
@@ -19,3 +21,11 @@ def index():
         }
     ]
     return render_template('index.html', user=user, posts=posts)
+
+# This view function is for the login page
+@app.route('/login')
+def login():
+    # create a variable form that is an instance of the login form class
+    form = LoginForm()
+    # return the login page template to the user
+    return render_template('login.html', title='Log in', form=form)
