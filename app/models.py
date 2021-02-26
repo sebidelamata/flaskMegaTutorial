@@ -1,10 +1,12 @@
 # import our database object
+from app import login
 from app import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 # users table
-class User(db.Model):
+class User(UserMixin, db.Model):
     # id column is an int primary key
     id = db.Column(db.Integer, primary_key=True)
     # can't have someone elses username
@@ -47,3 +49,13 @@ class Post(db.Model):
     # class instead of just returning the object
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+# login can't is a module from flask-login, but
+# that doesn't know about our db because of inheritance,
+# this function uses the database to return the user's id
+# from the db so that the login manager knows who they are
+#
+# this wrapper function registers the function as one to load user data with the login manager
+@login.user_loader()
+def load_user(id):
+    return User.query.get(int(id))
