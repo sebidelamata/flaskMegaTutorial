@@ -1,4 +1,4 @@
-{% extends base.html %}
+{% extends "base.html" %}
 
 {% block content %}
     <h1>User: {{ user.username }}</h1>
@@ -7,4 +7,5 @@
     <p>
         {{ post.author.username }} says: <b>{{ post.body }}</b>
     </p>
+    {% endfor %}
 {% endblock %}
