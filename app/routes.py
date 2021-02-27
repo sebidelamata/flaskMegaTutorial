@@ -24,7 +24,7 @@ def index():
             'body': 'Bet no cap hunnid'
         }
     ]
-    return render_template('index.html', user=user, posts=posts)
+    return render_template('index.html', title='Home', posts=posts)
 
 # This view function is for the login page
 # The wrapper function invokes both the get in post methods to
@@ -53,7 +53,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         # else redirect the user to the page they wanted to go to
-        return redirect(url_for(next_page))
+        return redirect(next_page)
     # return the login page template to the user
     return render_template('login.html', title='Log in', form=form)
 
@@ -72,7 +72,7 @@ def logout():
 def register():
     # if the user is already logged in and tries to register send
     # them to their homepage bc they dont need to be here
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return redirect(url_for('index'))
     # form is an instance of a registration form
     form = RegistrationForm()
