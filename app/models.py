@@ -56,6 +56,6 @@ class Post(db.Model):
 # from the db so that the login manager knows who they are
 #
 # this wrapper function registers the function as one to load user data with the login manager
-@login.user_loader()
+@login.user_loader
 def load_user(id):
     return User.query.get(int(id))

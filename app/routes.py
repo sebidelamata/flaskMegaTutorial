@@ -1,15 +1,17 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
+from werkzeug.urls import url_parse
 from app import app
 from app.forms import LoginForm
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
 # Homepage
 @app.route('/')
+# aka index page
 @app.route('/index')
+#login is required to see this page
+@login_required
 def index():
-    # user is the account holder (you if you are using the page)
-    user = {'username':'Sebi'}
     # posts is a list containing nested dictionaries (pretty much json)
     # that holds posts of users connected to the account of the current user (you)
     posts = [
@@ -42,9 +44,16 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
+        # else login the user and remember their authentication deets
         login_user(user, remember=form.remember_me.data)
-        # the flash function with flash the dialogue to the user
-        return redirect(url_for('/index'))
+        # 'next' is added to the url string
+        next_page = request.args.get('next')
+        # if the url does not have a next argument,
+        # next page is set to the home page the user is redirected to their home page
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('index')
+        # else redirect the user to the page they wanted to go to
+        return redirect(url_for(next_page))
     # return the login page template to the user
     return render_template('login.html', title='Log in', form=form)
 

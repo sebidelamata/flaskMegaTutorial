@@ -23,5 +23,9 @@ migrate = Migrate(app, db)
 # allows users to stay logged in while they browse through different views
 login = LoginManager(app)
 
+# here we are telling flask-login which
+# of our view functions handles the login
+login.login_view = 'login'
+
 # the app object imports a routes object, models defines the structure of the sqlite database.
 from app import routes, models
