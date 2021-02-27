@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
 from app import app
 from app.forms import LoginForm
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 from app.models import User
 
 # Homepage
@@ -47,3 +47,11 @@ def login():
         return redirect(url_for('/index'))
     # return the login page template to the user
     return render_template('login.html', title='Log in', form=form)
+
+# this function allows users to logout
+# this decorator function declares the view route
+@app.route('/logout')
+# logout logs the user out then redirects them to the index view
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
