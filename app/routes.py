@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
-from app import app
-from app.forms import LoginForm
+from app import app, db
+from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
@@ -64,3 +64,28 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+# this view function allows users to register for an account
+# this wrapper function declares the path for the view,
+# as well as invoking the get and post methods
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    # if the user is already logged in and tries to register send
+    # them to their homepage bc they dont need to be here
+    if current_user.is_authenticated():
+        return redirect(url_for('index'))
+    # form is an instance of a registration form
+    form = RegistrationForm()
+    # if the form goes through validly (is that a word?)
+    # set their password to what they entered in the form,
+    # add the user with all the fields (except user id)
+    # then commit the add to the database,
+    # then flash a message letting them know and redirect them to the login page
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your account has been registered!, Login to start!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
