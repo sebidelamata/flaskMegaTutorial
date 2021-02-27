@@ -89,3 +89,17 @@ def register():
         flash('Your account has been registered!, Login to start!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+# this function creates a user profile view at user slash
+# then whatever the username is. Login is required to be at this page
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    # try to load the user from the database or go to a 404 error
+    user = User.query.filter_by(username=username).first_or_404()
+    # this is a list of test posts
+    posts = [
+        {'author': user, 'body': "Test post #1"},
+        {'author': user, 'body': "Test post #2"}
+    ]
+    return render_template('user.html', user=user, posts=posts)
