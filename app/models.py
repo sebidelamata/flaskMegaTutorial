@@ -19,6 +19,10 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     # defines a relationship with post tab
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    # this field is for the user's bio on their page
+    about_me = db.Column(db.String(500))
+    # this keeps track of the last time the user was active
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     # this method tells python how to print the objects in this
     # class instead of just returning the object
