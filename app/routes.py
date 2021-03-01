@@ -2,11 +2,11 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
-# this fuction executes before any request
+# this function executes before any request
 # and grabs the time to show the last time the user was seen
 # the decorator function is from Flask and registers this
 # function as something that needs to happen before the requests occur
@@ -116,3 +116,24 @@ def user(username):
         {'author': user, 'body': "Test post #2"}
     ]
     return render_template('user.html', user=user, posts=posts)
+
+# this view allows the user to edit their profile info
+# this decorator function declares the route for the view
+@app.route('/edit_profile', methods=['GET', 'POST'])
+# the user must be signed in to see this view
+@login_required
+def edit_profile():
+    # form is an instance of the EditProfileForm class we created in forms.py
+    form = EditProfileForm()
+    # if the user correctly fills in the form and submits it the values will be updated in the database
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    # otherwise thesed fields will be filled in with the most current values for this
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='Edit Profile', form=form)

@@ -2,8 +2,8 @@
 # luckily we have a bunch of premade classes
 # that help make designing a form much quicker
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from app.models import User
 
 # here is our login for class that requires a user to enter
@@ -43,3 +43,8 @@ class RegistrationForm(FlaskForm):
         # if there are any matches raise an error
         if email is not None:
             raise ValidationError('There is already an account associated with this email')
+
+class EditProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    about_me = TextAreaField('About Me', validators=[Length(min=0, max=500)])
+    submit = SubmitField('Submit')
