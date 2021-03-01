@@ -28,4 +28,4 @@ login = LoginManager(app)
 login.login_view = 'login'
 
 # the app object imports a routes object, models defines the structure of the sqlite database.
-from app import routes, models
+from app import routes, models, errors
