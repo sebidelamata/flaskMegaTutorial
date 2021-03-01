@@ -1,9 +1,22 @@
+from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
+
+# this fuction executes before any request
+# and grabs the time to show the last time the user was seen
+# the decorator function is from Flask and registers this
+# function as something that needs to happen before the requests occur
+@app.before_request
+def before_request():
+    # if the user is signed in then last seen is updated to right now
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        # commit this to the database
+        db.session.commit()
 
 # Homepage
 @app.route('/')
