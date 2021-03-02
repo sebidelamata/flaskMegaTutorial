@@ -5,7 +5,7 @@ from app import app, db
 from app.models import User, Post
 
 class UserModelCase(unittest.TestCase):
-    # this tests to make sure we can config the data base to the right flavor of sql
+    # this  config the data base to the right flavor of sql
     def setup(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()

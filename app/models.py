@@ -36,7 +36,8 @@ class User(UserMixin, db.Model):
     # list of users I follow achieved through a join
     followed = db.relationship(
         # User table is the right side of the join followers is the left side
-        'User', secondary=followers,
+        'User',
+        secondary=followers,
         # first condition of join is that follower id is the same as id in the user table
         primaryjoin=(followers.c.follower_id == id),
         # this is similar to the above step, except this time with followed id
@@ -46,8 +47,7 @@ class User(UserMixin, db.Model):
         # lazy being set to dynamic means this query isnt run until
         # specifically asked to (same as posts), within the relationship method the second
         # lazy arg is for the right side of the sql statement and means pretty much the same thing
-        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
-    )
+        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     # this method tells python how to print the objects in this
     # class instead of just returning the object
@@ -101,19 +101,13 @@ class User(UserMixin, db.Model):
     # then we order these by date descending
     def followed_posts(self):
         followed = Post.query\
-            .join(
-            followers, (followers.c.followed_id == Post.user_id)
-        )\
-            .filter(
-            followers.c.follower_id == self.id
-        )
+            .join(followers, (followers.c.followed_id == Post.user_id))\
+            .filter(followers.c.follower_id == self.id)
         # we also want to see our own posts in the feed,
         # so we query our posts too, then sort by date
         own = Post.query.filter_by(user_id=self.id)
         return followed.union(own)\
-            .order_by(
-            Post.timestamp.desc()
-        )
+            .order_by(Post.timestamp.desc())
 
 
 
