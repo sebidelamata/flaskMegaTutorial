@@ -124,7 +124,9 @@ def user(username):
 @login_required
 def edit_profile():
     # form is an instance of the EditProfileForm class we created in forms.py
-    form = EditProfileForm()
+    # this takes the arg current_user.username to check if the person editing
+    # their profile has tried to change their username
+    form = EditProfileForm(current_user.username)
     # if the user correctly fills in the form and submits it the values will be updated in the database
     if form.validate_on_submit():
         current_user.username = form.username.data

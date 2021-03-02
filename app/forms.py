@@ -44,7 +44,26 @@ class RegistrationForm(FlaskForm):
         if email is not None:
             raise ValidationError('There is already an account associated with this email')
 
+# this form allows users to edit their profile infor
 class EditProfileForm(FlaskForm):
+    # it requires a username
     username = StringField('Username', validators=[DataRequired()])
+    # an optional about me field can have up to 500 characters
     about_me = TextAreaField('About Me', validators=[Length(min=0, max=500)])
+    # and a submit button
     submit = SubmitField('Submit')
+
+    # this initializes the old username as a variable that can be looked up later
+    def __init__(self, original_username, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+
+    # this takes the username argument and if it is not the same as the
+    # original username variable created in the __init__ function,
+    # then we query our database to check if this name already exists (doesnt not exist)
+    # if it doesnt not exist then we raise them an error and ask them to enter a unique username
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = User.query.filter_by(username=self.username.data). first()
+            if user is not None:
+                raise ValidationError('This username has already been taken, please enter a new one.')
