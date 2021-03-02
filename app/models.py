@@ -11,7 +11,7 @@ from hashlib import md5
 # so the sql equivalent would be a create table statement here
 # we have a follower id and a followed id,
 # both of these are tied to the id column of the user table
-followers = db.table('followers',
+followers = db.Table('followers',
                      db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
                      db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
                      )

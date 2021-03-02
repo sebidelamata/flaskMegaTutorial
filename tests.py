@@ -1,29 +1,35 @@
+# import packages
 from datetime import datetime, timedelta
 import unittest
 from app import app, db
 from app.models import User, Post
 
 class UserModelCase(unittest.TestCase):
+    # this  config the data base to the right flavor of sql
     def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()
 
+    # this destroys a database
     def tearDown(self):
         db.session.remove()
         db.drop_all()
 
+    # this one tests passwords
     def test_password_hashing(self):
         u = User(username='susan')
         u.set_password('cat')
         self.assertFalse(u.check_password('dog'))
         self.assertTrue(u.check_password('cat'))
 
+    # this one check the avatar creating stuff
     def test_avatar(self):
         u = User(username='john', email='john@example.com')
-        self.assertEqual(u.avatar(128), ('https://www.gravatar.com/avatar/'
-                                         'd4c74594d841139328695756648b6bd6'
-                                         '?d=identicon&s=128'))
+        self.assertEqual(
+            u.avatar(128), ('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?d=identicon&s=128')
+        )
 
+    # these next three test different parts of following users
     def test_follow(self):
         u1 = User(username='john', email='john@example.com')
         u2 = User(username='susan', email='susan@example.com')
@@ -47,6 +53,7 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(u1.followed.count(), 0)
         self.assertEqual(u2.followers.count(), 0)
 
+    # this method tests if we can get some posts from our users we follow
     def test_follow_posts(self):
         # create four users
         u1 = User(username='john', email='john@example.com')
@@ -57,22 +64,34 @@ class UserModelCase(unittest.TestCase):
 
         # create four posts
         now = datetime.utcnow()
-        p1 = Post(body="post from john", author=u1,
-                  timestamp=now + timedelta(seconds=1))
-        p2 = Post(body="post from susan", author=u2,
-                  timestamp=now + timedelta(seconds=4))
-        p3 = Post(body="post from mary", author=u3,
-                  timestamp=now + timedelta(seconds=3))
-        p4 = Post(body="post from david", author=u4,
-                  timestamp=now + timedelta(seconds=2))
+        p1 = Post(
+            body="post from john",
+            author=u1,
+            timestamp=now + timedelta(seconds=1)
+        )
+        p2 = Post(
+            body="post from susan",
+            author=u2,
+            timestamp=now + timedelta(seconds=4)
+        )
+        p3 = Post(
+            body="post from mary",
+            author=u3,
+            timestamp=now + timedelta(seconds=3)
+        )
+        p4 = Post(
+            body="post from david",
+            author=u4,
+            timestamp=now + timedelta(seconds=2)
+        )
         db.session.add_all([p1, p2, p3, p4])
         db.session.commit()
 
-        # setup the followers
-        u1.follow(u2)  # john follows susan
-        u1.follow(u4)  # john follows david
-        u2.follow(u3)  # susan follows mary
-        u3.follow(u4)  # mary follows david
+        # set up the followers
+        u1.follow(u2)
+        u1.follow(u4)
+        u2.follow(u3)
+        u3.follow(u4)
         db.session.commit()
 
         # check the followed posts of each user
