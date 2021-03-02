@@ -90,7 +90,29 @@ class User(UserMixin, db.Model):
     # if that happens more than zero times
     def is_following(self, user):
         return self.followed.filter(
-            followers.c.followed_id == user.id).count() > 0
+            followers.c.followed_id == user.id
+        )\
+             .count() > 0
+
+    # this method returns all the posts of people the user follows
+    # first we join Posts on followers where the user id for a
+    # post matches the people this user follows
+    # then we do a where statement where the follower id is the same as the users id
+    # then we order these by date descending
+    def followed_posts(self):
+        followed = Post.query\
+            .join(
+            followers, (followers.c.followed_id == Post.user_id)
+        )\
+            .filter(
+            followers.c.follower_id == self.id
+        )
+        # we also want to see our own posts in the feed,
+        # so we query our posts too, then sort by date
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own)\
+            .order_by(
+            Post.timestamp.desc()
         )
 
 
