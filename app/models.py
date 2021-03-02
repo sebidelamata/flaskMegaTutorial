@@ -6,6 +6,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from hashlib import md5
 
+# this is an auxillary table with other values than the
+# ones created here so that we can track who is following who
+# so the sql equivalent would be a create table statement here
+# we have a follower id and a followed id,
+# both of these are tied to the id column of the user table
+followers = db.table('followers',
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+                     )
+
 # users table
 class User(UserMixin, db.Model):
     # id column is an int primary key
@@ -23,6 +33,21 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.String(500))
     # this keeps track of the last time the user was active
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    # list of users I follow achieved through a join
+    followed = db.relationship(
+        # User table is the right side of the join followers is the left side
+        'User', secondary=followers,
+        # first condition of join is that follower id is the same as id in the user table
+        primaryjoin=(followers.c.follower_id == id),
+        # this is similar to the above step, except this time with followed id
+        secondaryjoin=(followers.c.followed_id == id),
+        # from the left side this relationship is followed,
+        # so on the other side it should be followers
+        # lazy being set to dynamic means this query isnt run until
+        # specifically asked to (same as posts), within the relationship method the second
+        # lazy arg is for the right side of the sql statement and means pretty much the same thing
+        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
+    )
 
     # this method tells python how to print the objects in this
     # class instead of just returning the object
@@ -46,6 +71,28 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
+    # this method allows users to follow another user
+    # if the user is not already following the user,
+    # they are given the option to follow the user
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    # this is similar to the method above,
+    # if the user is following a user, then they are
+    # given the option to unfollow the user (removed from the list)
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    # this method check is the user is following another user by an sql query
+    # selects the followed id column from the followers table if it matches the user's id
+    # if that happens more than zero times
+    def is_following(self, user):
+        return self.followed.filter(
+            followers.c.followed_id == user.id).count() > 0
+        )
+
 
 
 # posts table
@@ -63,6 +110,8 @@ class Post(db.Model):
     # class instead of just returning the object
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+
 
 # login can't is a module from flask-login, but
 # that doesn't know about our db because of inheritance,
