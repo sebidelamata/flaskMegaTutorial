@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
@@ -115,7 +115,9 @@ def user(username):
         {'author': user, 'body': "Test post #1"},
         {'author': user, 'body': "Test post #2"}
     ]
-    return render_template('user.html', user=user, posts=posts)
+    # we are instantiating the EmptyForm for follow/unfollow function here
+    form = EmptyForm()
+    return render_template('user.html', user=user, posts=posts, form=form)
 
 # this view allows the user to edit their profile info
 # this decorator function declares the route for the view
@@ -139,3 +141,51 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+# this view allows the user to follow another user
+# this decorator declares the route as well as the post method
+@app.route('/follow/<username>', methods=['POST'])
+# the user must be logged in to perform this
+@login_required
+def follow(username):
+    # we have an empty for with a button
+    form = EmptyForm()
+    # if the user clicks the button we will try to follow
+    if form.validate_on_submit():
+        # user is the person we are trying to follow
+        user = User.query.filter_by(username=username).first()
+        # if that person is not in the database for some reason,
+        # tell the user they couldnt find them and take them back tot the home page
+        if user is None:
+            flash('User {} not found.'.format(username))
+            return redirect(url_for('index'))
+        # if the person is the user (they are trying to follow themselves)
+        # tell them no and direct them to their profile page
+        if user == current_user:
+            flash('You can not follow yourself!')
+            return redirect(url_for('user', username=username))
+        # if those weird cases werent met then follow the person and commit it to the database
+        current_user.follow(user)
+        db.session.commit()
+        flash('You are now following {}!'.format(username))
+        return redirect(url_for('index'))
+
+# the unfollow does the opposite of the view above
+@app.route('/unfollow/<username>', methods=['POST'])
+@login_required
+def unfollow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=username).first()
+        if user is None:
+            flash('User {} not found').format(username)
+            return redirect(url_for('index'))
+        if user == current_user:
+            flash('You can not unfollow yourself!')
+            return redirect(url_for('user', username=username))
+        current_user.unfollow(user)
+        db.session.commit()
+        flash('You are not following {}.'.format(username))
+        return redirect(url_for('user', username=username))
+    else:
+        return redirect(url_for('index'))

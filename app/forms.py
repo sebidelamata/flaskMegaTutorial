@@ -67,3 +67,7 @@ class EditProfileForm(FlaskForm):
             user = User.query.filter_by(username=self.username.data). first()
             if user is not None:
                 raise ValidationError('This username has already been taken, please enter a new one.')
+
+# this is just an empty form with a submit button
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')
