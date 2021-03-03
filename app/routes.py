@@ -1,11 +1,26 @@
 from datetime import datetime
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, \
+    flash, \
+    redirect, \
+    url_for, \
+    request
 from werkzeug.urls import url_parse
-from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPAsswordRequestForm
+from app import app, \
+    db
+from app.forms import LoginForm, \
+    RegistrationForm, \
+    EditProfileForm, \
+    EmptyForm, \
+    PostForm, \
+    ResetPasswordRequestForm, \
+    ResetPasswordForm
 from app.email import send_password_reset_email
-from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Post
+from flask_login import current_user, \
+    login_user, \
+    logout_user, \
+    login_required
+from app.models import User, \
+    Post
 
 # this function executes before any request
 # and grabs the time to show the last time the user was seen
@@ -271,3 +286,27 @@ def reset_password_request():
     return render_template('reset_password_request.html',
                            title='Reset Password',
                            form=form)
+
+# this view actually resets the password once
+# the user provides the tokem they received by email
+# this decorator function declares the route for the view and the methods
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    # if the current user is logged in just put them on their index page
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    # user is equal to a boolean that evaluates the token
+    user = User.verify_reset_password_token(token)
+    # if it doesnt evaluate correctly then send them to the home page instead
+    if not user:
+        return redirect(url_for('index'))
+    # form is the new passwords and such in the reset password form
+    form = ResetPasswordForm()
+    # if they didnt screw up the form then the password gets
+    # reset and we flash a little message
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash("Your password has been reset.")
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', form=form)

@@ -79,9 +79,19 @@ class PostForm(FlaskForm):
     # this allows the user to submit the form
     submit = SubmitField('Submit')
 
-# this form is for users who need to reset their passwords
-class ResetPAsswordRequestForm(FlaskForm):
+# this form is for users who need to reset their passwords to request an email token
+class ResetPasswordRequestForm(FlaskForm):
     # the user's email is required and must be a valid email
     email = StringField('Email', validators=[DataRequired(), Email()])
+    # a submit button
+    submit = SubmitField('Request Password Reset')
+
+# this is the form where they reset their password after receiving the token
+class ResetPasswordForm(FlaskForm):
+    # new desired password
+    password = PasswordField('Password', validators=[DataRequired()])
+    # make sure this matches what they put in the first time
+    password2 = PasswordField('Repeat Password',
+                              validators=[DataRequired(), EqualTo('password')])
     # a submit button
     submit = SubmitField('Request Password Reset')
