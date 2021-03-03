@@ -33,21 +33,13 @@ def index():
     if form.validate_on_submit():
         # we create an instance of our Post containing the body of our post form
         post = Post(body=form.post.data, author=current_user)
-        # add this post to our data base
+        # add this post to our data base and flash a message
         db.session.add(post)
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
+    # posts is all the posts authored by the people the user follows
+    posts = current_user.followed_posts().all()
     return render_template('index.html', title='Home', form=form, posts=posts)
 
 # This view function is for the login page
