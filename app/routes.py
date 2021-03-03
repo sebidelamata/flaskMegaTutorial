@@ -192,3 +192,13 @@ def unfollow(username):
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))
+
+# this view allows our users to explore other profiles that they are not currently connected to
+# this decorator function establishes the route for the view
+@app.route('/explore')
+# the user must be logged in to view this view
+@login_required
+def explore():
+    # posts is all the posts in the dc in descending order by time
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.html', title='Explore', posts=posts)
