@@ -7,6 +7,7 @@ from flask_login import LoginManager
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
+from flask_mail import Mail
 
 # create application object consisting of a Flask instance
 app = Flask(__name__)
@@ -29,6 +30,9 @@ login = LoginManager(app)
 # here we are telling flask-login which
 # of our view functions handles the login
 login.login_view = 'login'
+
+# this is an instance of a mail service
+mail = Mail(app)
 
 # the app object imports a routes object,
 # models defines the structure of the sqlite database.

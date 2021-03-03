@@ -2,7 +2,8 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPAsswordRequestForm
+from app.email import send_password_reset_email
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
 
@@ -248,3 +249,25 @@ def explore():
                            posts=posts.items,
                            next_url=next_url,
                            prev_url=prev_url)
+
+# this view allows the user to request a password reset via email
+# this decorator function declares the route and methods
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    # if the user is logged in just send them to their home page
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    # a form is an instance of our form we made
+    form = ResetPAsswordRequestForm()
+    # if the form is filled out properly when submitted
+    if form.validate_on_submit():
+        # we try to find a user in the database whose email
+        # matches and send them an email if they do
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('login'))
+    return render_template('reset_password_request.html',
+                           title='Reset Password',
+                           form=form)
