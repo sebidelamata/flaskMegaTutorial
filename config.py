@@ -21,4 +21,4 @@ class Config(object):
     # these people will receive error logs
     ADMINS = ['sebidelamata@gmail.com']
     # this defines our posts per page
-    POSTS_PER_PAGE = 4
+    POSTS_PER_PAGE = 25
