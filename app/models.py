@@ -111,7 +111,7 @@ class User(UserMixin, db.Model):
             .order_by(Post.timestamp.desc())
 
     # this method returns a json web token that lasts a default of 10 minutes
-    def get_reset_password_token(selfself, expires_in=600):
+    def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             app.config['SECRET_KEY'],

@@ -273,7 +273,7 @@ def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     # a form is an instance of our form we made
-    form = ResetPAsswordRequestForm()
+    form = ResetPasswordRequestForm()
     # if the form is filled out properly when submitted
     if form.validate_on_submit():
         # we try to find a user in the database whose email
