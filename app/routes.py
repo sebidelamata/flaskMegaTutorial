@@ -46,8 +46,18 @@ def index():
         .paginate(page,
                   app.config['POSTS_PER_PAGE'],
                   False)
-
-    return render_template('index.html', title='Home', form=form, posts=posts.items)
+    # next url is the next number of posts is they exists,
+    # this is the same for the previous number
+    next_url = url_for('index', page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('index', page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template('index.html',
+                           title='Home',
+                           form=form,
+                           posts=posts.items,
+                           next_url=next_url,
+                           prev_url=prev_url)
 
 # This view function is for the login page
 # The wrapper function invokes both the get in post methods to
@@ -209,5 +219,17 @@ def explore():
     page = request.args.get('page', 1, type=int)
     # posts is all the posts in the dc in descending order by time
     posts = Post.query.order_by(Post.timestamp.desc())\
-        .paginate(page, app.config['POSTS_PER_PAGE'], False)
-    return render_template('index.html', title='Explore', posts=posts.items)
+        .paginate(page,
+                  app.config['POSTS_PER_PAGE'],
+                  False)
+    # next url shows the next number of posts if they exists,
+    # and the same for prev
+    next_url = url_for('explore', page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('explore', page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template('index.html',
+                           title='Explore',
+                           posts=posts.items,
+                           next_url=next_url,
+                           prev_url=prev_url)
