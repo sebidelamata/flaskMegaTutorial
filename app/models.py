@@ -1,10 +1,11 @@
 # import our database object
-from app import login
-from app import db
+from app import login, db, app
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from hashlib import md5
+from time import time
+import jwt
 
 # this is an auxillary table with other values than the
 # ones created here so that we can track who is following who
@@ -108,6 +109,25 @@ class User(UserMixin, db.Model):
         own = Post.query.filter_by(user_id=self.id)
         return followed.union(own)\
             .order_by(Post.timestamp.desc())
+
+    # this method returns a json web token that lasts a default of 10 minutes
+    def get_reset_password_token(selfself, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'],
+            algorithm='HS256'
+        )
+
+    # checks if the toke is valid
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token,
+                            app.config['SECRET_KEY'],
+                            algorithmns=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
 
 
 
