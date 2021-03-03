@@ -71,3 +71,10 @@ class EditProfileForm(FlaskForm):
 # this is just an empty form with a submit button
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
+
+# this form allows users to make posts
+class PostForm(FlaskForm):
+    # this is a text field that allows the user to post up to 500 characters
+    post = TextAreaField('Say something', validators=[DataRequired(), Length(min=1, max=500)])
+    # this allows the user to submit the form
+    submit = SubmitField('Submit')

@@ -73,3 +73,4 @@ WHERE user.id = ?]
 (Background on this error at: http://sqlalche.me/e/13/e3q8)
 2021-03-02 18:07:25,141 INFO: Microblog startup [in C:\Users\sebid\flaskMegaTutorial\app\__init__.py:80]
 2021-03-02 18:07:46,522 INFO: Microblog startup [in C:\Users\sebid\flaskMegaTutorial\app\__init__.py:80]
+2021-03-02 18:08:31,258 INFO: Microblog startup [in C:\Users\sebid\flaskMegaTutorial\app\__init__.py:80]

@@ -2,9 +2,9 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import User, Post
 
 # this function executes before any request
 # and grabs the time to show the last time the user was seen
@@ -19,25 +19,36 @@ def before_request():
         db.session.commit()
 
 # Homepage
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 # aka index page
-@app.route('/index')
+@app.route('/index', methods=['GET', 'POST'])
 #login is required to see this page
 @login_required
 def index():
     # posts is a list containing nested dictionaries (pretty much json)
     # that holds posts of users connected to the account of the current user (you)
+    # an object of an instance of our post form
+    form = PostForm()
+    # if the form is correctly submitted
+    if form.validate_on_submit():
+        # we create an instance of our Post containing the body of our post form
+        post = Post(body=form.post.data, author=current_user)
+        # add this post to our data base
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is now live!')
+        return redirect(url_for('index'))
     posts = [
         {
-            'author': {'username': 'Jerry'},
-            'body': 'My hair smells like old turkey and this upsets me.'
+            'author': {'username': 'John'},
+            'body': 'Beautiful day in Portland!'
         },
         {
-            'author': {'username': 'Joe'},
-            'body': 'Bet no cap hunnid'
+            'author': {'username': 'Susan'},
+            'body': 'The Avengers movie was so cool!'
         }
     ]
-    return render_template('index.html', title='Home', posts=posts)
+    return render_template('index.html', title='Home', form=form, posts=posts)
 
 # This view function is for the login page
 # The wrapper function invokes both the get in post methods to
