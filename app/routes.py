@@ -38,9 +38,16 @@ def index():
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
-    # posts is all the posts authored by the people the user follows
-    posts = current_user.followed_posts().all()
-    return render_template('index.html', title='Home', form=form, posts=posts)
+    page = request.args.get('page', 1, type=int)
+    # posts is all the posts authored by the people the user follows,
+    # this is paginated to the number of posts per page specified in the
+    # config file
+    posts = current_user.followed_posts()\
+        .paginate(page,
+                  app.config['POSTS_PER_PAGE'],
+                  False)
+
+    return render_template('index.html', title='Home', form=form, posts=posts.items)
 
 # This view function is for the login page
 # The wrapper function invokes both the get in post methods to
@@ -199,6 +206,8 @@ def unfollow(username):
 # the user must be logged in to view this view
 @login_required
 def explore():
+    page = request.args.get('page', 1, type=int)
     # posts is all the posts in the dc in descending order by time
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template('index.html', title='Explore', posts=posts)
+    posts = Post.query.order_by(Post.timestamp.desc())\
+        .paginate(page, app.config['POSTS_PER_PAGE'], False)
+    return render_template('index.html', title='Explore', posts=posts.items)

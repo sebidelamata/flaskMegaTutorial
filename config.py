@@ -20,3 +20,5 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     # these people will receive error logs
     ADMINS = ['sebidelamata@gmail.com']
+    # this defines our posts per page
+    POSTS_PER_PAGE = 4
