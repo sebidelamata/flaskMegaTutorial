@@ -4,7 +4,7 @@ from flask import render_template
 from threading import Thread
 
 def send_async_email(app, msg):
-    with app.context():
+    with app.app_context():
         mail.send(msg)
 
 # here we assign fields for our message and send it through asynchronous enail

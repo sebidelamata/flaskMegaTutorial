@@ -52,3 +52,4 @@ Traceback (most recent call last):
   File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 363, in send
     raise SMTPServerDisconnected('please run connect() first')
 smtplib.SMTPServerDisconnected: please run connect() first
+2021-03-04 17:05:33,223 INFO: Microblog startup [in C:\Users\sebid\flaskMegaTutorial\app\__init__.py:84]
