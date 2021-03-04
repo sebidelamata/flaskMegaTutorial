@@ -1,22 +1,25 @@
-2021-03-03 18:38:26,436 ERROR: Exception on /reset_password_request [GET] [in c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py:1891]
+2021-03-04 13:18:41,753 ERROR: Exception on /reset_password_request [POST] [in c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py:1891]
 Traceback (most recent call last):
-  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py", line 2447, in wsgi_app
-    response = self.full_dispatch_request()
-  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py", line 1952, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py", line 1821, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\_compat.py", line 39, in reraise
-    raise value
-  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py", line 1950, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py", line 1936, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "C:\Users\sebid\flaskMegaTutorial\app\routes.py", line 276, in reset_password_request
-    form = ResetPAsswordRequestForm()
-NameError: name 'ResetPAsswordRequestForm' is not defined
-2021-03-03 18:38:54,057 INFO: Microblog startup [in C:\Users\sebid\flaskMegaTutorial\app\__init__.py:84]
-2021-03-03 18:39:15,762 ERROR: Exception on /reset_password_request [POST] [in c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py:1891]
+  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask_mail.py", line 492, in send
+    message.send(connection)
+  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask_mail.py", line 427, in send
+    connection.send(self)
+  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask_mail.py", line 188, in send
+    self.host.sendmail(sanitize_address(envelope_from or message.sender),
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 856, in sendmail
+    self.ehlo_or_helo_if_needed()
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 604, in ehlo_or_helo_if_needed
+    if not (200 <= self.ehlo()[0] <= 299):
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 444, in ehlo
+    self.putcmd(self.ehlo_msg, name or self.local_hostname)
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 371, in putcmd
+    self.send(str)
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 363, in send
+    raise SMTPServerDisconnected('please run connect() first')
+smtplib.SMTPServerDisconnected: please run connect() first
+
+During handling of the above exception, another exception occurred:
+
 Traceback (most recent call last):
   File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask\app.py", line 2447, in wsgi_app
     response = self.full_dispatch_request()
@@ -32,8 +35,20 @@ Traceback (most recent call last):
     return self.view_functions[rule.endpoint](**req.view_args)
   File "C:\Users\sebid\flaskMegaTutorial\app\routes.py", line 283, in reset_password_request
     send_password_reset_email(user)
-  File "C:\Users\sebid\flaskMegaTutorial\app\email.py", line 17, in send_password_reset_email
-    token = user.get_reset_password_token()
-  File "C:\Users\sebid\flaskMegaTutorial\app\models.py", line 116, in get_reset_password_token
-    {'reset_password': self.id, 'exp': time() + expires_in},
-NameError: name 'self' is not defined
+  File "C:\Users\sebid\flaskMegaTutorial\app\email.py", line 18, in send_password_reset_email
+    send_email('[Microblog] Reset Your Password',
+  File "C:\Users\sebid\flaskMegaTutorial\app\email.py", line 12, in send_email
+    mail.send(msg)
+  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask_mail.py", line 492, in send
+    message.send(connection)
+  File "c:\users\sebid\flaskmegatutorial\venv\lib\site-packages\flask_mail.py", line 152, in __exit__
+    self.host.quit()
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 988, in quit
+    res = self.docmd("quit")
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 424, in docmd
+    self.putcmd(cmd, args)
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 371, in putcmd
+    self.send(str)
+  File "C:\Users\sebid\anaconda3\lib\smtplib.py", line 363, in send
+    raise SMTPServerDisconnected('please run connect() first')
+smtplib.SMTPServerDisconnected: please run connect() first
