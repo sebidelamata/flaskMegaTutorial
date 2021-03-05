@@ -8,6 +8,7 @@ import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 from flask_mail import Mail
+from flask_bootstrap import Bootstrap
 
 # create application object consisting of a Flask instance
 app = Flask(__name__)
@@ -33,6 +34,9 @@ login.login_view = 'login'
 
 # this is an instance of a mail service
 mail = Mail(app)
+
+# this is an instance of Bootstrap to help us with all of our css
+bootstrap = Bootstrap(app)
 
 # the app object imports a routes object,
 # models defines the structure of the sqlite database.
